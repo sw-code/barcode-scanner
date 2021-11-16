@@ -221,15 +221,10 @@ public class BarcodeScanner extends Plugin implements BarcodeCallback {
                 } else {
                     shouldRunScan = true;
                     prepare();
+                    configureCamera();
                 }
             }
         } else {
-            didRunCameraPrepare = false;
-
-            shouldRunScan = false;
-
-            configureCamera();
-
             final BarcodeCallback b = this;
             getActivity()
                 .runOnUiThread(
@@ -282,8 +277,6 @@ public class BarcodeScanner extends Plugin implements BarcodeCallback {
         if (getSavedCall() != null) {
             getSavedCall().resolve(jsObject);
         }
-
-        destroy();
     }
 
     @Override
