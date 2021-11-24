@@ -427,4 +427,7 @@ public class BarcodeScanner: CAPPlugin, AVCaptureMetadataOutputObjectsDelegate {
       }
     }
 
+    @objc func takePhoto(_ call: CAPPluginCall) {
+        call.reject("Not implemented yet")
+    }
 }

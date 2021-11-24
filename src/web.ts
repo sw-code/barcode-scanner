@@ -6,6 +6,7 @@ import type {
   ScanResult,
   CheckPermissionOptions,
   CheckPermissionResult,
+  ImageResult,
 } from './definitions';
 
 export class BarcodeScannerWeb
@@ -38,6 +39,10 @@ export class BarcodeScannerWeb
   }
 
   async openAppSettings(): Promise<void> {
+    throw this.unimplemented('Not implemented on web.');
+  }
+
+  async takePhoto(): Promise<ImageResult> {
     throw this.unimplemented('Not implemented on web.');
   }
 }

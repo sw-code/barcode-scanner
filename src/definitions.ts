@@ -8,6 +8,7 @@ export interface BarcodeScannerPlugin {
     options?: CheckPermissionOptions,
   ): Promise<CheckPermissionResult>;
   openAppSettings(): Promise<void>;
+  takePhoto(): Promise<ImageResult>;
 }
 
 export enum SupportedFormat {
@@ -55,4 +56,8 @@ export interface CheckPermissionResult {
   neverAsked?: boolean;
   restricted?: boolean; // ios only
   unknown?: boolean; // ios only
+}
+
+export interface ImageResult {
+  data: string;
 }

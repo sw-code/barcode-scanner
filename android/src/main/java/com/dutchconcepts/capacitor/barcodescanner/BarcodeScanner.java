@@ -3,15 +3,17 @@ package com.dutchconcepts.capacitor.barcodescanner;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.Settings;
+import android.util.Base64;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -32,7 +34,10 @@ import com.journeyapps.barcodescanner.BarcodeCallback;
 import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.BarcodeView;
 import com.journeyapps.barcodescanner.DefaultDecoderFactory;
+import com.journeyapps.barcodescanner.SourceData;
 import com.journeyapps.barcodescanner.camera.CameraSettings;
+import com.journeyapps.barcodescanner.camera.PreviewCallback;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -279,6 +284,79 @@ public class BarcodeScanner extends Plugin implements BarcodeCallback {
         }
     }
 
+    private void getCurrentPhoto(PluginCall call) {
+        if (mBarcodeView == null || mBarcodeView.getCameraInstance() == null) {
+            call.reject("Camera not initiated yet");
+            return;
+        }
+
+        getActivity()
+            .runOnUiThread(
+                () ->
+                    mBarcodeView
+                        .getCameraInstance()
+                        .requestPreview(
+                            new PreviewCallback() {
+                                @Override
+                                public void onPreview(SourceData sourceData) {
+                                    AsyncTask.execute(
+                                        () -> {
+                                            Bitmap image = scaleBitmap(sourceData.getBitmap());
+                                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                            image.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
+                                            byte[] byteArray = byteArrayOutputStream.toByteArray();
+                                            String encoded = Base64.encodeToString(byteArray, Base64.NO_WRAP);
+                                            JSObject jsObject = new JSObject();
+                                            jsObject.put("data", encoded);
+                                            getActivity()
+                                                .runOnUiThread(
+                                                    () -> {
+                                                        call.resolve(jsObject);
+                                                        scan();
+                                                    }
+                                                );
+                                        }
+                                    );
+                                }
+
+                                @Override
+                                public void onPreviewError(Exception e) {
+                                    getActivity()
+                                        .runOnUiThread(
+                                            () -> {
+                                                call.reject(e.getMessage(), e);
+                                                scan();
+                                            }
+                                        );
+                                }
+                            }
+                        )
+            );
+    }
+
+    private static final int maxWidth = 960;
+    private static final int maxHeight = 1280;
+
+    private Bitmap scaleBitmap(Bitmap bm) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+
+        if (width > height) {
+            float ratio = (float) width / maxWidth;
+            width = maxWidth;
+            height = (int) (height / ratio);
+        } else if (height > width) {
+            float ratio = (float) height / maxHeight;
+            height = maxHeight;
+            width = (int) (width / ratio);
+        } else {
+            height = maxHeight;
+            width = maxWidth;
+        }
+
+        return Bitmap.createScaledBitmap(bm, width, height, true);
+    }
+
     @Override
     public void handleOnPause() {
         if (mBarcodeView != null) {
@@ -324,6 +402,11 @@ public class BarcodeScanner extends Plugin implements BarcodeCallback {
     public void stopScan(PluginCall call) {
         destroy();
         call.resolve();
+    }
+
+    @PluginMethod
+    public void takePhoto(PluginCall call) {
+        getCurrentPhoto(call);
     }
 
     private static final String TAG_PERMISSION = "permission";
