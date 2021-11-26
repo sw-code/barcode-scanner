@@ -45,4 +45,12 @@ export class BarcodeScannerWeb
   async takePhoto(): Promise<ImageResult> {
     throw this.unimplemented('Not implemented on web.');
   }
+
+  async activateTorch(): Promise<void> {
+    throw this.unimplemented('Not implemented on web.');
+  }
+
+  async deactivateTorch(): Promise<void> {
+    throw this.unimplemented('Not implemented on web.');
+  }
 }

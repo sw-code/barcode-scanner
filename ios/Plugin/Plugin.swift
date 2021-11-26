@@ -430,4 +430,12 @@ public class BarcodeScanner: CAPPlugin, AVCaptureMetadataOutputObjectsDelegate {
     @objc func takePhoto(_ call: CAPPluginCall) {
         call.reject("Not implemented yet")
     }
+
+    @objc func activateTorch(_ call: CAPPluginCall) {
+        call.reject("Not implemented yet")
+    }
+
+    @objc func deactivateTorch(_ call: CAPPluginCall) {
+        call.reject("Not implemented yet")
+    }
 }

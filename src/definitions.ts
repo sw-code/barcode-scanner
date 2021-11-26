@@ -9,6 +9,8 @@ export interface BarcodeScannerPlugin {
   ): Promise<CheckPermissionResult>;
   openAppSettings(): Promise<void>;
   takePhoto(): Promise<ImageResult>;
+  activateTorch(): Promise<void>;
+  deactivateTorch(): Promise<void>;
 }
 
 export enum SupportedFormat {

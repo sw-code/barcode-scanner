@@ -334,6 +334,16 @@ public class BarcodeScanner extends Plugin implements BarcodeCallback {
             );
     }
 
+    private void toggleTorch(Boolean active) {
+        getActivity()
+            .runOnUiThread(
+                () -> {
+                    if (mBarcodeView == null || mBarcodeView.getCameraInstance() == null) return;
+                    mBarcodeView.getCameraInstance().setTorch(active);
+                }
+            );
+    }
+
     private static final int maxWidth = 960;
     private static final int maxHeight = 1280;
 
@@ -407,6 +417,18 @@ public class BarcodeScanner extends Plugin implements BarcodeCallback {
     @PluginMethod
     public void takePhoto(PluginCall call) {
         getCurrentPhoto(call);
+    }
+
+    @PluginMethod
+    public void activateTorch(PluginCall call) {
+        toggleTorch(true);
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void deactivateTorch(PluginCall call) {
+        toggleTorch(false);
+        call.resolve();
     }
 
     private static final String TAG_PERMISSION = "permission";

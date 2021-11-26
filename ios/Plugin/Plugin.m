@@ -10,4 +10,6 @@ CAP_PLUGIN(BarcodeScanner, "BarcodeScanner",
     CAP_PLUGIN_METHOD(checkPermission, CAPPluginReturnPromise);
     CAP_PLUGIN_METHOD(openAppSettings, CAPPluginReturnPromise);
     CAP_PLUGIN_METHOD(takePhoto, CAPPluginReturnPromise);
+    CAP_PLUGIN_METHOD(activateTorch, CAPPluginReturnPromise);
+    CAP_PLUGIN_METHOD(deactivateTorch, CAPPluginReturnPromise);
 )
